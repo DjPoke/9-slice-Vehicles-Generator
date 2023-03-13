@@ -3,3 +3,9 @@
 It takes pixel art pieces of vehicles, and randomly tiles them and assemble them together.
 
 ![screenshot](/screenshot.jpg?raw=true "Screenshot")
+
+It has been programmed in Purebasic.
+(The project has just started)
+
+Enjoy ;)
+DjPoke
