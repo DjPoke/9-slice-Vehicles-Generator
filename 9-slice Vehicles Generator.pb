@@ -63,7 +63,9 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   
   ; edit bodyparts gadgets
   PanelGadget(2, 276, 10, 514, 256)
+  ; =======================================================
   AddGadgetItem(2, -1, d$(1))
+  ; =======================================================
   ComboBoxGadget(3, 10, 10, 200, 25)
   TextGadget(20, 10, 42, 40, 25, "Scale:")
   TextGadget(43, 10, 82, 40, 25, "YMove:")
@@ -72,7 +74,9 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   SpinGadget(38, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
   TextGadget(31, 140, 42, 35, 25, "Filter:")
   ButtonImageGadget(26, 175, 40, 25, 25, ImageID(3001))
+  ; =======================================================
   AddGadgetItem(2, -1, d$(2))
+  ; =======================================================
   ComboBoxGadget(4, 10, 10, 200, 25)
   TextGadget(21, 10, 42, 40, 25, "Scale:")
   TextGadget(44, 10, 82, 40, 25, "YMove:")
@@ -81,7 +85,9 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   SpinGadget(39, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
   TextGadget(32, 140, 42, 35, 25, "Filter:")
   ButtonImageGadget(27, 175, 40, 25, 25, ImageID(3002))
+  ; =======================================================
   AddGadgetItem(2, -1, d$(3))
+  ; =======================================================
   ComboBoxGadget(5, 10, 10, 200, 25)
   TextGadget(22, 10, 42, 40, 25, "Scale:")
   TextGadget(45, 10, 82, 40, 25, "YMove:")
@@ -90,7 +96,9 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   SpinGadget(40, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
   TextGadget(33, 140, 42, 35, 25, "Filter:")
   ButtonImageGadget(28, 175, 40, 25, 25, ImageID(3003))
+  ; =======================================================
   AddGadgetItem(2, -1, d$(4))
+  ; =======================================================
   ComboBoxGadget(6, 10, 10, 200, 25)
   TextGadget(23, 10, 42, 40, 25, "Scale:")
   TextGadget(46, 10, 82, 40, 25, "YMove:")
@@ -99,7 +107,9 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   SpinGadget(41, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
   TextGadget(34, 140, 42, 35, 25, "Filter:")
   ButtonImageGadget(29, 175, 40, 25, 25, ImageID(3004))
+  ; =======================================================
   AddGadgetItem(2, -1, d$(5))
+  ; =======================================================
   ComboBoxGadget(7, 10, 10, 200, 25)
   TextGadget(24, 10, 42, 40, 25, "Scale:")
   TextGadget(47, 10, 82, 40, 25, "YMove:")
@@ -108,17 +118,18 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   SpinGadget(42, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
   TextGadget(35, 140, 42, 35, 25, "Filter:")
   ButtonImageGadget(30, 175, 40, 25, 25, ImageID(3005))
+  ; =======================================================
   CloseGadgetList()
   
-  TextGadget(18, 10, 282, 35, 25, "Scale:")
-  SpinGadget(19, 45, 280, 40, 25, 1, 2, #PB_Spin_Numeric)
+  TextGadget(18, 10, 282, 70, 25, "Full Scale:")
+  SpinGadget(19, 65, 280, 40, 25, 1, 2, #PB_Spin_Numeric)
   
-  ButtonGadget(25, 120, 280, 70, 25, "Lucky ?")
+  ButtonGadget(25, 240, 270, 70, 40, "Lucky ?")
   
-  TextGadget(36, 210, 282, 70, 25, "Color Preset:")
-  SpinGadget(37, 280, 280, 40, 25, 0, 6, #PB_Spin_Numeric)
+  TextGadget(36, 110, 282, 70, 25, "Color Preset:")
+  SpinGadget(37, 180, 280, 40, 25, 0, 6, #PB_Spin_Numeric)
 
-  ; set gadget texts to default value
+  ; set spin gadget texts to default value
   SetGadgetText(19, "1")
   SetGadgetText(37, "0")
   SetGadgetText(38, "0")
@@ -299,6 +310,7 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
             ; update each layer
             UpdateLayers()
           Case 37
+            ; get color preset value in its variable
             colorPreset = Val(GetGadgetText(37))
             
             ; update each layer
@@ -394,16 +406,23 @@ Procedure Draw9SliceSprite(n.i, w.i, h.i)
   
   ; apply filter  
   If colorPreset > 0
+    ; scan all the area of pixels
     For y = 0 To 255
       For x = 0 To 255
         DrawingMode(#PB_2DDrawing_AlphaChannel)
+        
+        ; if the pixel is not transparent...
         If Alpha(Point(x, y)) > 0
           DrawingMode(#PB_2DDrawing_Default)
+          
+          ; apply filter
           If colorPreset < 4
             col.i = Point(x, y) & color(n)
           Else
             col.i = Point(x, y) | color(n)
           EndIf
+          
+          ; replace it
           Plot(x, y, col)
         EndIf
       Next
@@ -591,8 +610,8 @@ Procedure UpdateLayers()
 EndProcedure
 
 ; IDE Options = PureBasic 6.01 LTS (Windows - x64)
-; CursorPosition = 278
-; FirstLine = 257
+; CursorPosition = 129
+; FirstLine = 113
 ; Folding = --
 ; EnableXP
 ; DPIAware
