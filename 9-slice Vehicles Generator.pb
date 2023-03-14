@@ -170,7 +170,7 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
               SetGadgetText(i, "")
             Next
             
-            ; reset values
+            ; reset Y move values
             For i = 38 To 42
               SetGadgetText(i, "0")
             Next            
@@ -276,12 +276,19 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
                 SetGadgetText(i, Str(Random(7, 0)))
               EndIf
             Next            
-            
+                                    
+            ; reset Y move values
+            For i = 38 To 42
+              SetGadgetText(i, "0")
+            Next            
+
             ; update each layer
             UpdateLayers()
           Case 26, 27, 28, 29, 30
+            ; get the new color
             color(eg - 25) = ColorRequester()
             
+            ; replace it images on the pressed button
             StartDrawing(ImageOutput(eg - 25 + 3000))
             DrawingMode(#PB_2DDrawing_Default)
             Box(0, 0, 25, 25, color(eg - 25))
@@ -584,6 +591,8 @@ Procedure UpdateLayers()
 EndProcedure
 
 ; IDE Options = PureBasic 6.01 LTS (Windows - x64)
+; CursorPosition = 278
+; FirstLine = 257
 ; Folding = --
 ; EnableXP
 ; DPIAware
