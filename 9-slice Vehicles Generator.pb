@@ -15,6 +15,7 @@ Declare Draw9SliceSprite(n.i, w.i, h.i)
 Declare UpdateCanvas()
 Declare SaveSpriteAs()
 Declare LoadGadgetImage(i.i)
+Declare UpdateLayers()
 
 ; vars
 Global Dim x.i(5)
@@ -60,41 +61,51 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   ; canvas
   CanvasGadget(1, 10, 10, 256, 256)
   
-  ; edit bodyparts buttons
+  ; edit bodyparts gadgets
   PanelGadget(2, 276, 10, 514, 256)
   AddGadgetItem(2, -1, d$(1))
   ComboBoxGadget(3, 10, 10, 200, 25)
   TextGadget(20, 10, 42, 40, 25, "Scale:")
+  TextGadget(43, 10, 82, 40, 25, "YMove:")
   SpinGadget(8, 50, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
   SpinGadget(9, 90, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(38, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
   TextGadget(31, 140, 42, 35, 25, "Filter:")
   ButtonImageGadget(26, 175, 40, 25, 25, ImageID(3001))
   AddGadgetItem(2, -1, d$(2))
   ComboBoxGadget(4, 10, 10, 200, 25)
   TextGadget(21, 10, 42, 40, 25, "Scale:")
+  TextGadget(44, 10, 82, 40, 25, "YMove:")
   SpinGadget(10, 50, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
   SpinGadget(11, 90, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(39, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
   TextGadget(32, 140, 42, 35, 25, "Filter:")
   ButtonImageGadget(27, 175, 40, 25, 25, ImageID(3002))
   AddGadgetItem(2, -1, d$(3))
   ComboBoxGadget(5, 10, 10, 200, 25)
   TextGadget(22, 10, 42, 40, 25, "Scale:")
+  TextGadget(45, 10, 82, 40, 25, "YMove:")
   SpinGadget(12, 50, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
   SpinGadget(13, 90, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(40, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
   TextGadget(33, 140, 42, 35, 25, "Filter:")
   ButtonImageGadget(28, 175, 40, 25, 25, ImageID(3003))
   AddGadgetItem(2, -1, d$(4))
   ComboBoxGadget(6, 10, 10, 200, 25)
   TextGadget(23, 10, 42, 40, 25, "Scale:")
+  TextGadget(46, 10, 82, 40, 25, "YMove:")
   SpinGadget(14, 50, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
   SpinGadget(15, 90, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(41, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
   TextGadget(34, 140, 42, 35, 25, "Filter:")
   ButtonImageGadget(29, 175, 40, 25, 25, ImageID(3004))
   AddGadgetItem(2, -1, d$(5))
   ComboBoxGadget(7, 10, 10, 200, 25)
   TextGadget(24, 10, 42, 40, 25, "Scale:")
+  TextGadget(47, 10, 82, 40, 25, "YMove:")
   SpinGadget(16, 50, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
   SpinGadget(17, 90, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(42, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
   TextGadget(35, 140, 42, 35, 25, "Filter:")
   ButtonImageGadget(30, 175, 40, 25, 25, ImageID(3005))
   CloseGadgetList()
@@ -110,6 +121,11 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   ; set gadget texts to default value
   SetGadgetText(19, "1")
   SetGadgetText(37, "0")
+  SetGadgetText(38, "0")
+  SetGadgetText(39, "0")
+  SetGadgetText(40, "0")
+  SetGadgetText(41, "0")
+  SetGadgetText(42, "0")
   
   ; create render images
   For i = 11 To 15
@@ -153,6 +169,11 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
             For i = 8 To 17
               SetGadgetText(i, "")
             Next
+            
+            ; reset values
+            For i = 38 To 42
+              SetGadgetText(i, "0")
+            Next            
             
             ; reset color filters
             For i = 3001 To 3005
@@ -247,26 +268,17 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
             For i = 8 To 16 Step 2
               If GetGadgetState(((i - 6) / 2) + 2) > -1
                 SetGadgetText(i, Str(Random(7, 0)))
-                
-                sx((i - 6) / 2) = Val(GetGadgetText(i))
-                x((i - 6) / 2) = (256 - ((sx((i - 6) / 2) + 2) * width((i - 6) / 2))) / 2
-                
-                Draw9SliceSprite(((i - 6) / 2), sx((i - 6) / 2), sy((i - 6) / 2))
-                UpdateCanvas()
               EndIf
             Next
             
             For i = 9 To 17 Step 2
               If GetGadgetState(((i - 7) / 2) + 2) > -1
                 SetGadgetText(i, Str(Random(7, 0)))
-                
-                sy((i - 7) / 2) = Val(GetGadgetText(i))
-                y((i - 7) / 2) = (256 - ((sy((i - 7) / 2) + 2) * height((i - 7) / 2))) / 2
-                
-                Draw9SliceSprite(((i - 7) / 2), sx((i - 7) / 2), sy((i - 7) / 2))
-                UpdateCanvas()
               EndIf
             Next            
+            
+            ; update each layer
+            UpdateLayers()
           Case 26, 27, 28, 29, 30
             color(eg - 25) = ColorRequester()
             
@@ -277,47 +289,16 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
             
             SetGadgetAttribute(eg, #PB_Button_Image, ImageID(eg - 25 + 3000))
             
-            For i = 8 To 16 Step 2
-              If GetGadgetState(((i - 6) / 2) + 2) > -1
-                sx((i - 6) / 2) = Val(GetGadgetText(i))
-                x((i - 6) / 2) = (256 - ((sx((i - 6) / 2) + 2) * width((i - 6) / 2))) / 2
-                
-                Draw9SliceSprite(((i - 6) / 2), sx((i - 6) / 2), sy((i - 6) / 2))
-                UpdateCanvas()
-              EndIf
-            Next
-            
-            For i = 9 To 17 Step 2
-              If GetGadgetState(((i - 7) / 2) + 2) > -1
-                sy((i - 7) / 2) = Val(GetGadgetText(i))
-                y((i - 7) / 2) = (256 - ((sy((i - 7) / 2) + 2) * height((i - 7) / 2))) / 2
-                
-                Draw9SliceSprite(((i - 7) / 2), sx((i - 7) / 2), sy((i - 7) / 2))
-                UpdateCanvas()
-              EndIf
-            Next
+            ; update each layer
+            UpdateLayers()
           Case 37
             colorPreset = Val(GetGadgetText(37))
             
-            For i = 8 To 16 Step 2
-              If GetGadgetState(((i - 6) / 2) + 2) > -1
-                sx((i - 6) / 2) = Val(GetGadgetText(i))
-                x((i - 6) / 2) = (256 - ((sx((i - 6) / 2) + 2) * width((i - 6) / 2))) / 2
-                
-                Draw9SliceSprite(((i - 6) / 2), sx((i - 6) / 2), sy((i - 6) / 2))
-                UpdateCanvas()
-              EndIf
-            Next
-            
-            For i = 9 To 17 Step 2
-              If GetGadgetState(((i - 7) / 2) + 2) > -1
-                sy((i - 7) / 2) = Val(GetGadgetText(i))
-                y((i - 7) / 2) = (256 - ((sy((i - 7) / 2) + 2) * height((i - 7) / 2))) / 2
-                
-                Draw9SliceSprite(((i - 7) / 2), sx((i - 7) / 2), sy((i - 7) / 2))
-                UpdateCanvas()
-              EndIf
-            Next
+            ; update each layer
+            UpdateLayers()
+          Case 38, 39, 40, 41, 42
+            ; update each layer
+            UpdateLayers()
         EndSelect
     EndSelect
   ForEver
@@ -435,6 +416,7 @@ Procedure UpdateCanvas()
     EndIf
   Next
   
+  ; apply scale offset
   sx = ((scale - 1) * 256) / 2
   sy = ((scale - 1) * 256) / 2
   
@@ -442,11 +424,11 @@ Procedure UpdateCanvas()
   DrawingMode(#PB_2DDrawing_AllChannels)
   Box(0, 0, 256, 256, RGBA(255, 255, 255, 255))
   DrawingMode(#PB_2DDrawing_AlphaBlend)
-  DrawImage(ImageID(11), layerX(1) - sx, layerY(1) - sy)
-  DrawImage(ImageID(12), layerX(2) - sx, layerY(2) - sy)
-  DrawImage(ImageID(13), layerX(3) - sx, layerY(3) - sy)
-  DrawImage(ImageID(14), layerX(4) - sx, layerY(4) - sy)
-  DrawImage(ImageID(15), layerX(5) - sx, layerY(5) - sy)
+  DrawImage(ImageID(11), layerX(1) - sx, layerY(1) - sy - (height(1) * scale * Val(GetGadgetText(38))))
+  DrawImage(ImageID(12), layerX(2) - sx, layerY(2) - sy - (height(2) * scale * Val(GetGadgetText(39))))
+  DrawImage(ImageID(13), layerX(3) - sx, layerY(3) - sy - (height(3) * scale * Val(GetGadgetText(40))))
+  DrawImage(ImageID(14), layerX(4) - sx, layerY(4) - sy - (height(4) * scale * Val(GetGadgetText(41))))
+  DrawImage(ImageID(15), layerX(5) - sx, layerY(5) - sy - (height(5) * scale * Val(GetGadgetText(42))))
   StopDrawing()  
 EndProcedure
 
@@ -480,11 +462,11 @@ Procedure SaveSpriteAs()
   
   StartDrawing(ImageOutput(1000))
   DrawingMode(#PB_2DDrawing_AlphaBlend)
-  DrawImage(ImageID(11), layerX(1) - sx, layerY(1) - sy)
-  DrawImage(ImageID(12), layerX(2) - sx, layerY(2) - sy)
-  DrawImage(ImageID(13), layerX(3) - sx, layerY(3) - sy)
-  DrawImage(ImageID(14), layerX(4) - sx, layerY(4) - sy)
-  DrawImage(ImageID(15), layerX(5) - sx, layerY(5) - sy)
+  DrawImage(ImageID(11), layerX(1) - sx, layerY(1) - sy - (height(1) * scale * Val(GetGadgetText(38))))
+  DrawImage(ImageID(12), layerX(2) - sx, layerY(2) - sy - (height(2) * scale * Val(GetGadgetText(39))))
+  DrawImage(ImageID(13), layerX(3) - sx, layerY(3) - sy - (height(3) * scale * Val(GetGadgetText(40))))
+  DrawImage(ImageID(14), layerX(4) - sx, layerY(4) - sy - (height(4) * scale * Val(GetGadgetText(41))))
+  DrawImage(ImageID(15), layerX(5) - sx, layerY(5) - sy - (height(5) * scale * Val(GetGadgetText(42))))
   StopDrawing()
   
   ; crop the sprite
@@ -577,9 +559,31 @@ Procedure LoadGadgetImage(i.i)
   SetGadgetText(((i) * 2) + 6, Str(sx(i)))
   SetGadgetText(((i) * 2) + 7, Str(sy(i)))
 EndProcedure
+
+; update all layers
+Procedure UpdateLayers()
+  For i = 8 To 16 Step 2
+    If GetGadgetState(((i - 6) / 2) + 2) > -1
+      sx((i - 6) / 2) = Val(GetGadgetText(i))
+      x((i - 6) / 2) = (256 - ((sx((i - 6) / 2) + 2) * width((i - 6) / 2))) / 2
+      
+      Draw9SliceSprite(((i - 6) / 2), sx((i - 6) / 2), sy((i - 6) / 2))
+      UpdateCanvas()
+    EndIf
+  Next
+  
+  For i = 9 To 17 Step 2
+    If GetGadgetState(((i - 7) / 2) + 2) > -1
+      sy((i - 7) / 2) = Val(GetGadgetText(i))
+      y((i - 7) / 2) = (256 - ((sy((i - 7) / 2) + 2) * height((i - 7) / 2))) / 2
+      
+      Draw9SliceSprite(((i - 7) / 2), sx((i - 7) / 2), sy((i - 7) / 2))
+      UpdateCanvas()
+    EndIf
+  Next
+EndProcedure
+
 ; IDE Options = PureBasic 6.01 LTS (Windows - x64)
-; CursorPosition = 51
-; FirstLine = 33
 ; Folding = --
 ; EnableXP
 ; DPIAware
