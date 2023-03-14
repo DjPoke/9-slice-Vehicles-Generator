@@ -4,6 +4,18 @@
 ; by DjPoke (c) 2023
 ;===========================
 
+; constants
+CompilerIf #PB_Compiler_OS = #PB_OS_Windows
+  #SLASH = "\"
+CompilerElse
+  #SLASH = "/"
+CompilerEndIf
+
+#render = 10
+#finalRender = 1000
+#croppedRender = 2000
+#ImgBtn = 3000
+
 ; encoders and decoders
 UsePNGImageEncoder()
 UsePNGImageDecoder()
@@ -37,6 +49,8 @@ d$(5) = "Weapons"
 
 Global colorPreset = 0
 
+Global dir$ = GetCurrentDirectory()
+
 ; open the window
 If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_SystemMenu|#PB_Window_TitleBar|#PB_Window_ScreenCentered|#PB_Window_MinimizeGadget)
   If CreateMenu(0, WindowID(0))
@@ -52,10 +66,10 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   AddKeyboardShortcut(0, #PB_Shortcut_Control|#PB_Shortcut_S, 2)
   AddKeyboardShortcut(0, #PB_Shortcut_Control|#PB_Shortcut_Q, 9)
   
-  ; create color images
-  For i = 3001 To 3005
-    color(i - 3000) = RGB(255, 255, 255)
-    CreateImage(i, 25, 25, 32, color(i - 3000))
+  ; create color images for image buttons
+  For i = 1 To 5
+    color(i) = RGB(255, 255, 255)
+    CreateImage(i + #ImgBtn, 25, 25, 32, color(i))
   Next
   
   ; canvas
@@ -67,67 +81,67 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   AddGadgetItem(2, -1, d$(1))
   ; =======================================================
   ComboBoxGadget(3, 10, 10, 200, 25)
-  TextGadget(20, 10, 42, 40, 25, "Scale:")
-  TextGadget(43, 10, 82, 40, 25, "YMove:")
-  SpinGadget(8, 50, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
-  SpinGadget(9, 90, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
-  SpinGadget(38, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
-  TextGadget(31, 140, 42, 35, 25, "Filter:")
-  ButtonImageGadget(26, 175, 40, 25, 25, ImageID(3001))
+  TextGadget(20, 15, 45, 40, 25, "Scale:")
+  TextGadget(43, 15, 85, 40, 25, "YMove:")
+  SpinGadget(8, 70, 40, 60, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(9, 130, 40, 60, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(38, 70, 80, 60, 25, -8, 8, #PB_Spin_Numeric)
+  TextGadget(31, 210, 45, 35, 25, "Filter:")
+  ButtonImageGadget(26, 260, 40, 25, 25, ImageID(3001))
   ; =======================================================
   AddGadgetItem(2, -1, d$(2))
   ; =======================================================
   ComboBoxGadget(4, 10, 10, 200, 25)
-  TextGadget(21, 10, 42, 40, 25, "Scale:")
-  TextGadget(44, 10, 82, 40, 25, "YMove:")
-  SpinGadget(10, 50, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
-  SpinGadget(11, 90, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
-  SpinGadget(39, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
-  TextGadget(32, 140, 42, 35, 25, "Filter:")
-  ButtonImageGadget(27, 175, 40, 25, 25, ImageID(3002))
+  TextGadget(21, 15, 45, 40, 25, "Scale:")
+  TextGadget(44, 15, 85, 40, 25, "YMove:")
+  SpinGadget(10, 70, 40, 60, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(11, 130, 40, 60, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(39, 70, 80, 60, 25, -8, 8, #PB_Spin_Numeric)
+  TextGadget(32, 210, 45, 35, 25, "Filter:")
+  ButtonImageGadget(27, 260, 40, 25, 25, ImageID(3002))
   ; =======================================================
   AddGadgetItem(2, -1, d$(3))
   ; =======================================================
   ComboBoxGadget(5, 10, 10, 200, 25)
-  TextGadget(22, 10, 42, 40, 25, "Scale:")
-  TextGadget(45, 10, 82, 40, 25, "YMove:")
-  SpinGadget(12, 50, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
-  SpinGadget(13, 90, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
-  SpinGadget(40, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
-  TextGadget(33, 140, 42, 35, 25, "Filter:")
-  ButtonImageGadget(28, 175, 40, 25, 25, ImageID(3003))
+  TextGadget(22, 15, 45, 40, 25, "Scale:")
+  TextGadget(45, 15, 85, 40, 25, "YMove:")
+  SpinGadget(12, 70, 40, 60, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(13, 130, 40, 60, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(40, 70, 80, 60, 25, -8, 8, #PB_Spin_Numeric)
+  TextGadget(33, 210, 45, 35, 25, "Filter:")
+  ButtonImageGadget(28, 260, 40, 25, 25, ImageID(3003))
   ; =======================================================
   AddGadgetItem(2, -1, d$(4))
   ; =======================================================
   ComboBoxGadget(6, 10, 10, 200, 25)
-  TextGadget(23, 10, 42, 40, 25, "Scale:")
-  TextGadget(46, 10, 82, 40, 25, "YMove:")
-  SpinGadget(14, 50, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
-  SpinGadget(15, 90, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
-  SpinGadget(41, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
-  TextGadget(34, 140, 42, 35, 25, "Filter:")
-  ButtonImageGadget(29, 175, 40, 25, 25, ImageID(3004))
+  TextGadget(23, 15, 45, 40, 25, "Scale:")
+  TextGadget(46, 15, 85, 40, 25, "YMove:")
+  SpinGadget(14, 70, 40, 60, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(15, 130, 40, 60, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(41, 70, 80, 60, 25, -8, 8, #PB_Spin_Numeric)
+  TextGadget(34, 210, 45, 35, 25, "Filter:")
+  ButtonImageGadget(29, 260, 40, 25, 25, ImageID(3004))
   ; =======================================================
   AddGadgetItem(2, -1, d$(5))
   ; =======================================================
   ComboBoxGadget(7, 10, 10, 200, 25)
-  TextGadget(24, 10, 42, 40, 25, "Scale:")
-  TextGadget(47, 10, 82, 40, 25, "YMove:")
-  SpinGadget(16, 50, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
-  SpinGadget(17, 90, 40, 40, 25, 0, 7, #PB_Spin_Numeric)
-  SpinGadget(42, 50, 80, 40, 25, -8, 8, #PB_Spin_Numeric)
-  TextGadget(35, 140, 42, 35, 25, "Filter:")
-  ButtonImageGadget(30, 175, 40, 25, 25, ImageID(3005))
+  TextGadget(24, 15, 45, 40, 25, "Scale:")
+  TextGadget(47, 15, 85, 40, 25, "YMove:")
+  SpinGadget(16, 70, 40, 60, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(17, 130, 40, 60, 25, 0, 7, #PB_Spin_Numeric)
+  SpinGadget(42, 70, 80, 60, 25, -8, 8, #PB_Spin_Numeric)
+  TextGadget(35, 210, 45, 35, 25, "Filter:")
+  ButtonImageGadget(30, 260, 40, 25, 25, ImageID(3005))
   ; =======================================================
   CloseGadgetList()
   
-  TextGadget(18, 10, 282, 70, 25, "Full Scale:")
-  SpinGadget(19, 65, 280, 40, 25, 1, 2, #PB_Spin_Numeric)
+  TextGadget(18, 10, 285, 70, 25, "Full Scale:")
+  SpinGadget(19, 80, 280, 60, 25, 1, 2, #PB_Spin_Numeric)
   
-  ButtonGadget(25, 240, 270, 70, 40, "Lucky ?")
+  ButtonGadget(25, 500, 270, 70, 40, "Lucky ?")
   
-  TextGadget(36, 115, 282, 70, 25, "Color Preset:")
-  SpinGadget(37, 185, 280, 40, 25, 0, 6, #PB_Spin_Numeric)
+  TextGadget(36, 150, 285, 90, 25, "Color Preset:")
+  SpinGadget(37, 240, 280, 60, 25, 0, 6, #PB_Spin_Numeric)
 
   ; set spin gadget texts to default value
   SetGadgetText(19, "1")
@@ -139,8 +153,8 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   SetGadgetText(42, "0")
   
   ; create render images
-  For i = 11 To 15
-    CreateImage(i, 256, 256, 32, #PB_Image_Transparent)
+  For i = 1 To 5
+    CreateImage(i + #render, 256, 256, 32, #PB_Image_Transparent)
   Next
   
   ; update 9-slice sprites in all lists
@@ -148,11 +162,15 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
  
   ; select cockpit first
   SetGadgetState(2, 0)
+  
+  ; clear events queue
+  While WindowEvent()
+  Wend
 
   ; events loop
   Repeat
     ev = WaitWindowEvent()
-    
+
     Select ev
       Case #PB_Event_Menu
         em = EventMenu()
@@ -160,9 +178,9 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
         Select em
           Case 1
             ; replace render images by new ones
-            For i = 11 To 15
-              FreeImage(i)
-              CreateImage(i, 256, 256, 32, #PB_Image_Transparent)
+            For i = 1 To 5
+              FreeImage(i + #render)
+              CreateImage(i + #render, 256, 256, 32, #PB_Image_Transparent)
             Next
             
             ; clear the canvas
@@ -187,11 +205,11 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
             Next            
             
             ; reset color filters
-            For i = 3001 To 3005
-              FreeImage(i)
-              color(i - 3000) = RGB(255, 255, 255)
-              CreateImage(i, 25, 25, 32, color(i - 3000))
-              SetGadgetAttribute(i - 3000 + 25, #PB_Button_Image, ImageID(i))
+            For i = 1 To 5
+              FreeImage(i + #ImgBtn)
+              color(i) = RGB(255, 255, 255)
+              CreateImage(i + #ImgBtn, 25, 25, 32, color(i))
+              SetGadgetAttribute(i + 25, #PB_Button_Image, ImageID(i + #ImgBtn))
             Next
           Case 2
             SaveSpriteAs()
@@ -245,34 +263,34 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
                 For i = 1 To 5
                   color(i) = RGB(r, g, b)
                   
-                  StartDrawing(ImageOutput(i + 3000))
+                  StartDrawing(ImageOutput(i + #ImgBtn))
                   DrawingMode(#PB_2DDrawing_Default)
                   Box(0, 0, 25, 25, color(i))
                   StopDrawing()
                   
-                  SetGadgetAttribute(i + 25, #PB_Button_Image, ImageID(i + 3000))
+                  SetGadgetAttribute(i + 25, #PB_Button_Image, ImageID(i + #ImgBtn))
                 Next
               Case 2, 5
                 For i = 1 To 5
                   color(i) = RGB(Random(255, 192), Random(255, 192), Random(255, 192))
                   
-                  StartDrawing(ImageOutput(i + 3000))
+                  StartDrawing(ImageOutput(i + #ImgBtn))
                   DrawingMode(#PB_2DDrawing_Default)
                   Box(0, 0, 25, 25, color(i))
                   StopDrawing()
                   
-                  SetGadgetAttribute(i + 25, #PB_Button_Image, ImageID(i + 3000))
+                  SetGadgetAttribute(i + 25, #PB_Button_Image, ImageID(i + #ImgBtn))
                 Next
               Case 3, 6
                 For i = 1 To 5
                   color(i) = RGB(Random(255, 64), Random(255, 64), Random(255, 64))
                   
-                  StartDrawing(ImageOutput(i + 3000))
+                  StartDrawing(ImageOutput(i + #ImgBtn))
                   DrawingMode(#PB_2DDrawing_Default)
                   Box(0, 0, 25, 25, color(i))
                   StopDrawing()
                   
-                  SetGadgetAttribute(i + 25, #PB_Button_Image, ImageID(i + 3000))
+                  SetGadgetAttribute(i + 25, #PB_Button_Image, ImageID(i + #ImgBtn))
                 Next
             EndSelect
             
@@ -301,12 +319,12 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
             color(eg - 25) = ColorRequester()
             
             ; replace it images on the pressed button
-            StartDrawing(ImageOutput(eg - 25 + 3000))
+            StartDrawing(ImageOutput(eg - 25 + #ImgBtn))
             DrawingMode(#PB_2DDrawing_Default)
             Box(0, 0, 25, 25, color(eg - 25))
             StopDrawing()
             
-            SetGadgetAttribute(eg, #PB_Button_Image, ImageID(eg - 25 + 3000))
+            SetGadgetAttribute(eg, #PB_Button_Image, ImageID(eg - 25 + #ImgBtn))
             
             ; update each layer
             UpdateLayers()
@@ -343,6 +361,7 @@ Procedure UpdateSpriteLists()
   For i = 3 To 7
     If CountGadgetItems(i) = 0
       AddGadgetItem(i, -1, "Not selected yet")
+      
       If ExamineDirectory(0, d$(i - 2), "*.png")
         While NextDirectoryEntry(0)
           If DirectoryEntryType(0) = #PB_DirectoryEntry_File
@@ -360,8 +379,8 @@ EndProcedure
 
 ; draw a 9-slice sprite
 Procedure Draw9SliceSprite(n.i, w.i, h.i)
-  FreeImage(10 + n)
-  CreateImage(10 + n, 256, 256, 32, #PB_Image_Transparent)
+  FreeImage(#render + n)
+  CreateImage(#render + n, 256, 256, 32, #PB_Image_Transparent)
   
   For i = 21 To 29
     If IsImage(i)
@@ -379,7 +398,7 @@ Procedure Draw9SliceSprite(n.i, w.i, h.i)
   GrabImage(n, 28, width(n), 2 * height(n), width(n), height(n))
   GrabImage(n, 29, 2 * width(n), 2 * height(n), width(n), height(n))
   
-  StartDrawing(ImageOutput(10 + n))
+  StartDrawing(ImageOutput(#render + n))
   DrawingMode(#PB_2DDrawing_AlphaBlend)
   
   DrawImage(ImageID(21), x(n), y(n), width(n), height(n))
@@ -440,7 +459,7 @@ EndProcedure
 Procedure UpdateCanvas()
   scale = Val(GetGadgetText(19))
   
-  For i = 11 To 15
+  For i = #render + 1 To #render + 5
     If ImageWidth(i) <> 256 * scale
       ResizeImage(i, 256 * scale, 256 * scale, #PB_Image_Raw)
     EndIf
@@ -466,7 +485,7 @@ EndProcedure
 Procedure SaveSpriteAs()
   scale = Val(GetGadgetText(19))
   
-  For i = 11 To 15
+  For i = #render + 1 To #render + 5
     If ImageWidth(i) <> 256 * scale
       ResizeImage(i, 256 * scale, 256 * scale, #PB_Image_Raw)
     EndIf
@@ -488,9 +507,9 @@ Procedure SaveSpriteAs()
     ProcedureReturn
   EndIf
   
-  CreateImage(1000, 256, 256, 32, #PB_Image_Transparent)
+  CreateImage(#finalRender, 256, 256, 32, #PB_Image_Transparent)
   
-  StartDrawing(ImageOutput(1000))
+  StartDrawing(ImageOutput(#finalRender))
   DrawingMode(#PB_2DDrawing_AlphaBlend)
   DrawImage(ImageID(11), layerX(1) - sx, layerY(1) - sy - (height(1) * scale * Val(GetGadgetText(38))))
   DrawImage(ImageID(12), layerX(2) - sx, layerY(2) - sy - (height(2) * scale * Val(GetGadgetText(39))))
@@ -505,7 +524,7 @@ Procedure SaveSpriteAs()
   y1.i = 0
   y2.i = 255
   
-  StartDrawing(ImageOutput(1000))
+  StartDrawing(ImageOutput(#finalRender))
   DrawingMode(#PB_2DDrawing_AllChannels)
   
   ; find top
@@ -558,25 +577,25 @@ Procedure SaveSpriteAs()
   h1 = y2 - y1 + 1
   
   ; grab cropped image
-  GrabImage(1000, 2000, x1, y1, w1, h1)
+  GrabImage(#finalRender, #croppedRender, x1, y1, w1, h1)
   
   ; save the sprite
   f$ = SaveFileRequester("Save the rendered sprite...", "Sprite.png", "*.png", 0)
   
   If f$ <> ""
-    SaveImage(2000, f$, #PB_ImagePlugin_PNG)
+    SaveImage(#croppedRender, f$, #PB_ImagePlugin_PNG)
   EndIf
   
-  FreeImage(2000)
-  FreeImage(1000)
+  FreeImage(#croppedRender)
+  FreeImage(#finalRender)
   
 EndProcedure
 
 ; load gadget image
 Procedure LoadGadgetImage(i.i)
   If GetGadgetState(i + 2) > 0
-    LoadImage(i, d$(i) + "\" + GetGadgetItemText(i + 2, GetGadgetState(i + 2)))
-  Else
+    LoadImage(i, dir$ + d$(i) + #SLASH + GetGadgetItemText(i + 2, GetGadgetState(i + 2)))
+  ElseIf GetGadgetState(i + 2) = 0
     CreateImage(i, 8, 8, 32, #PB_Image_Transparent)
   EndIf
   
@@ -616,10 +635,9 @@ Procedure UpdateLayers()
     EndIf
   Next
 EndProcedure
-
 ; IDE Options = PureBasic 6.01 LTS (Windows - x64)
-; CursorPosition = 208
-; FirstLine = 201
+; CursorPosition = 140
+; FirstLine = 127
 ; Folding = --
 ; EnableXP
 ; DPIAware
