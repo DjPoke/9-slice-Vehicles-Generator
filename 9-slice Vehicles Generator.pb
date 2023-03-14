@@ -126,8 +126,8 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
   
   ButtonGadget(25, 240, 270, 70, 40, "Lucky ?")
   
-  TextGadget(36, 110, 282, 70, 25, "Color Preset:")
-  SpinGadget(37, 180, 280, 40, 25, 0, 6, #PB_Spin_Numeric)
+  TextGadget(36, 115, 282, 70, 25, "Color Preset:")
+  SpinGadget(37, 185, 280, 40, 25, 0, 6, #PB_Spin_Numeric)
 
   ; set spin gadget texts to default value
   SetGadgetText(19, "1")
