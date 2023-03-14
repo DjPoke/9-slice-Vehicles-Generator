@@ -173,7 +173,7 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
             
             ; clear combobox
             For i = 3 To 7
-              SetGadgetState(i, -1)
+              SetGadgetState(i, 0)
             Next
             
             ; clear values
@@ -207,6 +207,7 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
         Select eg
           Case 3, 4, 5, 6, 7
             If GetGadgetState(eg) > -1
+              ; change the current limb sprite
               LoadGadgetImage(eg - 2)
             EndIf
           Case 8, 10, 12, 14, 16
@@ -231,7 +232,7 @@ If OpenWindow(0, 0, 0, 800, 600, "9-slice Vehicles Generator", #PB_Window_System
             ; load gadget images
             For i = 1 To 5
               SetGadgetState(i + 2, Random(CountGadgetItems(i + 2) - 1, 0))
-              LoadGadgetImage(i)              
+              LoadGadgetImage(i)
             Next
             
             ; random colors
@@ -341,6 +342,7 @@ EndProcedure
 Procedure UpdateSpriteLists()
   For i = 3 To 7
     If CountGadgetItems(i) = 0
+      AddGadgetItem(i, -1, "Not selected yet")
       If ExamineDirectory(0, d$(i - 2), "*.png")
         While NextDirectoryEntry(0)
           If DirectoryEntryType(0) = #PB_DirectoryEntry_File
@@ -351,6 +353,8 @@ Procedure UpdateSpriteLists()
         FinishDirectory(0)
       EndIf
     EndIf
+    
+    SetGadgetState(i, 0)
   Next
 EndProcedure
 
@@ -570,7 +574,11 @@ EndProcedure
 
 ; load gadget image
 Procedure LoadGadgetImage(i.i)
-  LoadImage(i, d$(i) + "\" + GetGadgetItemText(i + 2, GetGadgetState(i + 2)))
+  If GetGadgetState(i + 2) > 0
+    LoadImage(i, d$(i) + "\" + GetGadgetItemText(i + 2, GetGadgetState(i + 2)))
+  Else
+    CreateImage(i, 8, 8, 32, #PB_Image_Transparent)
+  EndIf
   
   width(i) = ImageWidth(i) / 3
   height(i) = ImageHeight(i) / 3
@@ -610,8 +618,8 @@ Procedure UpdateLayers()
 EndProcedure
 
 ; IDE Options = PureBasic 6.01 LTS (Windows - x64)
-; CursorPosition = 129
-; FirstLine = 113
+; CursorPosition = 208
+; FirstLine = 201
 ; Folding = --
 ; EnableXP
 ; DPIAware
